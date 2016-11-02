@@ -33,7 +33,7 @@ def recv(sock, minlength):
     while len(buf) < minlength:
         try:
             tmp = sock.recv(minlength - len(buf))
-        except (socket.error, socket.timeout):
+        except (sock.error, sock.timeout):
             logging.critical("Exception when reading from sock: {0}".format(e))
             raise Disconnect()
 
