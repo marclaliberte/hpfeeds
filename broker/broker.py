@@ -4,16 +4,9 @@
 import gevent, gevent.server, gevent.monkey
 gevent.monkey.patch_all()
 
-import sys
-import os
-import logging
-import collections
-import traceback
+import sys, time, os, logging, collections, traceback, config, database, proto, utils
 
-import config
-import database
-import proto
-import utils
+from daemon import runner
 from utils import Disconnect, BadClient
 
 log = logging.getLogger("broker")
@@ -223,14 +216,33 @@ class Server(object):
         for c in subscribed_conns:
             yield c
 
+class Broker(object):
+    def __init__(self):
+        self.stdin_path = '/dev/null'
+        self.stdout_path = '/dev/null'
+        self.stderr_path = '/dev/null'
+        self.pidfile_path = '/opt/hpfeeds/broker/pid/broker.pid'
+        self.pidfile_timeout = 5
+        self.logfile = '/opt/hpfeeds/broker/logs/broker.log'
 
-def main():
-    logging.basicConfig(level=logging.DEBUG if config.DEBUG else logging.INFO)
-    log.info("broker starting up...")
-    s = Server()
-    s.serve_forever()
-    return 0
+    def run(self):
+        logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                            filename=self.logfile,
+                            level=logging.DEBUG if config.DEBUG else logging.INFO)
+        try:
+            while True:
+                log.info("broker starting up...")
+                s = Server()
+                s.serve_forever()
+        except (SystemExit,KeyboardInterrupt):
+            pass
+        except:
+            log.exception("Exception")
+        finally:
+            log.info("broker shutting down...")
 
 if __name__ == '__main__':
-    try: sys.exit(main())
-    except KeyboardInterrupt: pass
+
+    broker_runner = runner.DaemonRunner(Broker())
+    broker_runner.do_action()
+
