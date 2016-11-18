@@ -28,6 +28,7 @@ class Connection(object):
 
     def write(self, data):
         try:
+            log.debug("Writing data to: {0}".format(self.addr))
             self.sock.sendall(data)
         except Exception as e:
             #traceback.print_exc()
@@ -37,6 +38,7 @@ class Connection(object):
     def handle(self):
         # first send the info message
         self.authrand = authrand = os.urandom(4)
+        log.debug("Authentication starting for: {0}".format(self.addr))
         self.write(proto.msginfo(config.FBNAME, authrand))
 
         self.mandatory_authentication()
@@ -143,7 +145,7 @@ class Server(object):
         self.listener.serve_forever()
 
     def _newconn(self, sock, addr):
-        log.debug('Connection from {0}.'.format(addr))
+        log.debug('New connection from {0}.'.format(addr))
         fc = self.connclass(sock, addr, self)
         self.connections.add(fc)
         
@@ -167,7 +169,7 @@ class Server(object):
         except: pass
 
     def do_publish(self, c, chan, data):
-        log.debug('publish to {0} by {1} ak {2} addr {3}'.format(chan, c.uid, c.ak, c.addr))
+        log.info('Publish to {0} by {1} ak {2} addr {3}'.format(chan, c.uid, c.ak, c.addr))
         try:
             for c2 in self.receivers(chan, c, self.subscribermap[chan]):
                 c2.forward(c.ak, chan, data)
@@ -175,14 +177,14 @@ class Server(object):
             traceback.print_exc()
         
     def do_subscribe(self, c, ident, chan):
-        log.debug('broker subscribe to {0} by {1}@{2}'.format(chan, ident, c.addr))
+        log.info('Broker subscribe to {0} by {1}@{2}'.format(chan, ident, c.addr))
         self.subscribermap[chan].append(c)
         self.conn2chans[c].append(chan)
         if not chan.endswith('..broker'):
             self._brokerchan(c, chan, ident, 'join')
     
     def do_unsubscribe(self, c, ident, chan):
-        log.debug('broker unsubscribe to {0} by {1}@{2}'.format(chan, ident, c.addr))
+        log.info('Broker unsubscribe to {0} by {1}@{2}'.format(chan, ident, c.addr))
         self.subscribermap[chan].remove(c)
         self.conn2chans[c].remove(chan)
         if not chan.endswith('..broker'):
