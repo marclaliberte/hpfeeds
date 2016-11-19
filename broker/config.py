@@ -16,3 +16,7 @@ FBNAME = "hpfeeds"
 # SSL options ({} makes plain socket)
 SSLOPTS = {}
 #SSLOPTS = dict(keyfile="./server.key", certfile="./server.crt")
+
+# Mongo Settings
+MONGOHOST = "127.0.0.1"
+MONGOPORT = 27017

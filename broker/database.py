@@ -2,12 +2,13 @@
 
 import json
 import pymongo
+import config
 
 import config
 
 class Database(object):
     def __init__(self):
-        self.mongo = pymongo.MongoClient()
+        self.mongo = pymongo.MongoClient(host=config.MONGOHOST,port=config.MONGOPORT)
         self.check_db()
 
     def check_db(self):

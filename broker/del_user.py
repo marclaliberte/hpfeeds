@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import pymongo
+import config
 import sys
 
 def handle_list(arg):
@@ -15,7 +16,7 @@ if len(sys.argv) < 2:
 
 ident = sys.argv[1]
 
-client = pymongo.MongoClient()
+client = pymongo.MongoClient(host=config.MONGOHOST,port=config.MONGOPORT)
 res = client.hpfeeds.auth_key.remove({"identifier": ident})
 client.fsync()
 client.close()
