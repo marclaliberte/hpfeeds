@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import pymongo
+import config
 import sys
 
 def handle_list(arg):
@@ -25,7 +26,7 @@ rec = {
     "subscribe":subscribe
 }
 
-client = pymongo.MongoClient()
+client = pymongo.MongoClient(host=config.MONGOHOST,port=config.MONGOPORT)
 res = client.hpfeeds.auth_key.update({"identifier": ident}, {"$set": rec}, upsert=True)
 client.fsync()
 client.close()
