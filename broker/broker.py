@@ -246,5 +246,8 @@ class Broker(object):
 if __name__ == '__main__':
 
     broker_runner = runner.DaemonRunner(Broker())
+    # Docker causes is_detach_process_context_required() to return False
+    # Explicitly set detach_process to True (override None)
+    broker_runner.daemon_context.detach_process=True
     broker_runner.do_action()
 
