@@ -48,6 +48,7 @@ class Connection(object):
 
             if not ident == self.ak:
                 self.error("Invalid authkey in message.", ident=ident)
+                log.critical("Invalid authkey in message from: {0}".format(ident))
                 raise BadClient()
 
             if opcode == proto.OP_PUBLISH:
@@ -55,6 +56,7 @@ class Connection(object):
 
                 if not self.may_publish(chan) or chan.endswith("..broker"):
                     self.error("Authkey not allowed to publish here.", chan=chan)
+                    log.critical("Authkey not allowed ot publish here: {0}".format(chan))
                     continue
 
                 self.srv.do_publish(self, chan, payload)
@@ -67,6 +69,7 @@ class Connection(object):
 
                 if not self.may_subscribe(checkchan):
                     self.error("Authkey not allowed to subscribe here.", chan=chan)
+                    log.critical("Authkey not allowed ot publish here: {0}".format(chan))
                     continue
 
                 self.srv.do_subscribe(self, ident, chan)
@@ -77,6 +80,7 @@ class Connection(object):
 
             else:
                 self.error("Unknown message type.", opcode=opcode, length=len(data))
+                log.critical("Unknown message type: {0}".format(opcode))
                 raise BadClient()
 
     def may_publish(self, chan):
@@ -89,6 +93,7 @@ class Connection(object):
         opcode, ident, rhash = self.read_message()
         if not opcode == proto.OP_AUTH:
             self.error("First message was not AUTH.")
+            log.critical("First message was not AUTH")
             raise BadClient()
 
         self.authkey_check(ident, rhash)
@@ -97,12 +102,14 @@ class Connection(object):
         akrow = self.srv.get_authkey(ident)
         if not akrow:
             self.error("Authentication failed.", ident=ident)
+            log.critical("Authentication failed for: {0}".format(ident))
             raise BadClient()
 
         akhash = utils.hash(self.authrand, akrow["secret"])
 
         if not akhash == rhash:
             self.error("Authentication failed.", ident=ident)
+            log.critical("Authentication failed for: {0}".format(ident))
             raise BadClient()
 
         self.ak = ident
@@ -121,7 +128,7 @@ class Connection(object):
 
     def error(self, msg, *args, **context):
         emsg = msg.format(*args)
-        log.critical(emsg)
+#        log.critical(emsg)
         self.srv.log_error(emsg, self, context)
         self.write(proto.msgerror(emsg))
 
