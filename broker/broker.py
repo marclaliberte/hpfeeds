@@ -228,8 +228,8 @@ class Server(object):
 class Broker(object):
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/null'
-        self.stderr_path = '/dev/null'
+        self.stdout_path = '/opt/hpfeeds/broker/logs/out.log'
+        self.stderr_path = '/opt/hpfeeds/broker/logs/err.log'
         self.pidfile_path = '/opt/hpfeeds/broker/pid/broker.pid'
         self.pidfile_timeout = 5
         self.logfile = '/opt/hpfeeds/broker/logs/broker.log'
