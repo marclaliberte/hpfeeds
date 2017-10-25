@@ -10,7 +10,7 @@ def handle_list(arg):
     else:
         return []
 
-if len(sys.argv) < 5:
+if len(sys.argv) < 3:
     print >> sys.stderr, "Usage: %s <ident> <secret>"%sys.argv[0]
     sys.exit(1)
 
