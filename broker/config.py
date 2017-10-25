@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 # debug, turns on debug logging output
-DEBUG = True
+DEBUG = False
 
 # bind to this
 FBIP = "0.0.0.0"
